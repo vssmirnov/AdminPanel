@@ -37,8 +37,12 @@ else
                                 </div>
                                 <div class="col-9">
                                     <div class="card-body">
-                                        <h5 class="card-title" style="text-decoration: underline">@post.text</h5>
-                                        <p class="card-text">@post.text</p>
+                                        <small class="mb-4">@ConvertToDateFormat(@post.publishDate)</small>
+                                        <div class="mb-4">@post.text</div>
+                                        <div class="card-text">
+                                            <img width="25" class="w-5 mr-2 float-left" alt="like" src="https://dummyapi.io/img/like.svg">
+                                            @post.likes
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -53,6 +57,11 @@ else
 @code {
     public IList<Post> PostsToShow;
     private const int lifeBuffer = 300000;
+
+    private string ConvertToDateFormat(string date)
+    {
+        return Convert.ToDateTime(date).ToString("F");
+    }
 
     protected override async Task OnInitializedAsync()
     {

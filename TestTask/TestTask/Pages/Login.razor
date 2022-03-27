@@ -61,13 +61,8 @@
     {
         var userFromService = await
         ((CustomAuthenticationStateProvider)AuthenticationStateProvider).AuthenticateUser(myModel.Username, myModel.Password);
-        if (userFromService == false)
+        if (!userFromService)
         {
-            await JS.InvokeAsync<object>("alert", "Unsuccessful login!");
-        }
-        else
-        {
-            await JS.InvokeAsync<object>("alert", "Successful login!");
             NavigationManager.NavigateTo("/");
         }
     }
@@ -79,7 +74,6 @@
         public string Username { get; set; }
 
         [Required]
-        //[MinLength(8)]
         public string Password { get; set; }
     }
 }

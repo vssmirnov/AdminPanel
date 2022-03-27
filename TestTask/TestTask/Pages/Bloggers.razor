@@ -26,7 +26,7 @@ else
     <div class="row">
         @foreach (var blogger in BloggersToShow)
                 {
-                    <div class="col-12">
+                    <div class="col-12" @onclick="@(() => NavigateToComponent(blogger))">
                         <div class="card" style="width: 100%;">
                             <div class="row">
                                 <div class="col-3">
@@ -34,9 +34,8 @@ else
                                 </div>
                                 <div class="col-9">
                                     <div class="card-body">
-                                        <h5 class="card-title" style="text-decoration: underline">@blogger.firstName</h5>
-                                        <p class="card-text">@blogger.title</p>
-                                        <button class="btn btn-primary" @onclick="@(() => NavigateToComponent(blogger))">View comments</button>
+                                        <h5 class="card-title">@blogger.id</h5>
+                                        <h5 class="card-title" style="text-decoration: underline">@blogger.title @blogger.firstName @blogger.lastName</h5>
                                     </div>
                                 </div>
                             </div>

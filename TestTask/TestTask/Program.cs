@@ -16,10 +16,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddOptions();
 builder.Services.AddTransient<AuthService>();
-builder.Services.AddTransient<BloggerService>(x => new BloggerService(apiKey, baseUrl, 
-        builder.Services.BuildServiceProvider().GetService<IHttpClientFactory>()));
-builder.Services.AddTransient<PostService>(x => new PostService(apiKey, baseUrl,
-        builder.Services.BuildServiceProvider().GetService<IHttpClientFactory>()));
+builder.Services.AddTransient<BloggerService>(x => new BloggerService(apiKey, baseUrl));
+builder.Services.AddTransient<PostService>(x => new PostService(apiKey, baseUrl));
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 

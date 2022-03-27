@@ -7,39 +7,44 @@ namespace TestTask.Services
     {
         private string apiKey;
         private string baseUrl;
-        private readonly IHttpClientFactory _httpClientFactory;
 
-        public PostService(string apiKey, string baseUrl, IHttpClientFactory httpClientFactory)
+        public PostService(string apiKey, string baseUrl)
         {
             this.apiKey = apiKey;
             this.baseUrl = baseUrl;
-            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<IList<Post>> GetPostsAsync(string Id)
         {
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, baseUrl + $"/user/{Id}/post?limit=10")
+            using (var handler = new HttpClientHandler())
             {
-                Headers = { { "app-id", apiKey }
-            }
-            };
+                handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                handler.ServerCertificateCustomValidationCallback =
+                    (httpRequestMessage, cert, cetChain, policyErrors) =>
+                    {
+                        return true;
+                    };
 
-            var httpClient = _httpClientFactory.CreateClient();
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+                using var client = new HttpClient(handler);
+                client.DefaultRequestHeaders.Add("app-id", apiKey);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream =
-                    await httpResponseMessage.Content.ReadAsStreamAsync();
+                using var result = await client.GetAsync(baseUrl + $"/user/{Id}/post?limit=10");
 
-                var posts = await JsonSerializer.DeserializeAsync<PostHttpModel>(contentStream);
+                if (result.IsSuccessStatusCode)
+                {
+                    using var contentStream =
+                        await result.Content.ReadAsStreamAsync();
 
-                return posts.data.ToList();
+                    var posts = await JsonSerializer.DeserializeAsync<PostHttpModel>(contentStream);
+
+                    return posts.data.ToList();
+                }
             }
 
             return new List<Post>();
         }
     }
+
     class PostHttpModel
     {
         public IEnumerable<Post> data { get; set; }

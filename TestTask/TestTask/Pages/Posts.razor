@@ -1,19 +1,19 @@
-﻿@page "/viewUsers"
+﻿@page "/Posts"
 @using Models
 @using Data
-@inject Services.BloggerService BloggerService
+@inject Services.PostService PostService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
 
-<h2 class="title">Bloggers</h2>
+<h2 class="title">Posts</h2>
 
-@if (BloggersToShow == null)
+@if (PostsToShow == null)
 {
     <p>
         <em>Loading...</em>
     </p>
 }
-else if (!BloggersToShow.Any())
+else if (!PostsToShow.Any())
 {
     <p>
         <em>No recipes exist. Please add some.</em>
@@ -22,19 +22,18 @@ else if (!BloggersToShow.Any())
 else
 {
     <div class="row">
-        @foreach (var blogger in BloggersToShow)
+        @foreach (var post in PostsToShow)
                 {
                     <div class="col-12">
                         <div class="card" style="width: 100%;">
                             <div class="row">
                                 <div class="col-3">
-                                    <img src="@blogger.picture" class="card-img-top" alt="@blogger.title">
+                                    <img src="@post.image" class="card-img-top" alt="@post.text">
                                 </div>
                                 <div class="col-9">
                                     <div class="card-body">
-                                        <h5 class="card-title" style="text-decoration: underline">@blogger.firstName</h5>
-                                        <p class="card-text">@blogger.title</p>
-                                        <button class="btn btn-primary" @onclick="@(() => NavigateToComponent(blogger))">View comments</button>
+                                        <h5 class="card-title" style="text-decoration: underline">@post.text</h5>
+                                        <p class="card-text">@post.text</p>
                                     </div>
                                 </div>
                             </div>
@@ -47,15 +46,11 @@ else
 
 
 @code {
-    public IList<Blogger> BloggersToShow;        
+    public IList<Post> PostsToShow;        
     
     protected override async Task OnInitializedAsync()
     {
-        BloggersToShow = await BloggerService.GetBloggersAsync();
+        PostsToShow = await PostService.GetPostsAsync();
         base.OnInitialized();
-    }
-
-    private void NavigateToComponent(Blogger p) {
-      NavigationManager.NavigateTo("commentView/" + p.id);
     }
 }

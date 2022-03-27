@@ -12,6 +12,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddOptions();
 builder.Services.AddTransient<AuthService>();
 builder.Services.AddTransient<BloggerService>();
+builder.Services.AddTransient<PostService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 

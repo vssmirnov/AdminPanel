@@ -1,0 +1,61 @@
+﻿@page "/viewUsers"
+@using Models
+@using Data
+@inject Services.BloggerService BloggerService
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+<h2 class="title">Bloggers</h2>
+
+@if (BloggersToShow == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else if (!BloggersToShow.Any())
+{
+    <p>
+        <em>No recipes exist. Please add some.</em>
+    </p>
+}
+else
+{
+    <div class="row">
+        @foreach (var blogger in BloggersToShow)
+                {
+                    <div class="col-12">
+                        <div class="card" style="width: 100%;">
+                            <div class="row">
+                                <div class="col-3">
+                                    <img src="@blogger.picture" class="card-img-top" alt="@blogger.title">
+                                </div>
+                                <div class="col-9">
+                                    <div class="card-body">
+                                        <h5 class="card-title" style="text-decoration: underline">@blogger.firstName</h5>
+                                        <p class="card-text">@blogger.title</p>
+                                        <button class="btn btn-primary" @onclick="@(() => NavigateToComponent(blogger))">View comments</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+    </div>
+}
+
+
+
+@code {
+    public IList<Blogger> BloggersToShow;        
+    
+    protected override async Task OnInitializedAsync()
+    {
+        BloggersToShow = await BloggerService.GetBloggersAsync();
+        base.OnInitialized();
+    }
+
+    private void NavigateToComponent(Blogger p) {
+      NavigationManager.NavigateTo("commentView/" + p.id);
+    }
+}

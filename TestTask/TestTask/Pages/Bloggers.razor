@@ -1,6 +1,8 @@
 ﻿@page "/Bloggers"
 @using Models
 @using Data
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedLocalStorage ProtectedLocalStore
 @inject Services.BloggerService BloggerService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
@@ -47,12 +49,38 @@ else
 
 
 @code {
-    public IList<Blogger> BloggersToShow;        
-    
+    public IList<Blogger> BloggersToShow;  
+    private const int lifeBuffer = 300000;
+
     protected override async Task OnInitializedAsync()
     {
-        BloggersToShow = await BloggerService.GetBloggersAsync();
+        var result = await ProtectedLocalStore.GetAsync<IList<Blogger>>("Blogger");
+
+        if (result.Success)
+        {
+            BloggersToShow = result.Value;
+        }
+        else
+        {
+            BloggersToShow = await BloggerService.GetBloggersAsync();
+            await ProtectedLocalStore.SetAsync("Blogger", BloggersToShow);
+
+            System.Threading.Timer timer;
+            timer = new System.Threading.Timer(async _ => 
+            {
+               await ProtectedLocalStore.DeleteAsync("Blogger");
+            }, null, lifeBuffer, lifeBuffer);
+
+            CloseTimer(timer);
+        }
+
         base.OnInitialized();
+    }
+
+    private async Task CloseTimer(System.Threading.Timer timer)
+    {
+        await Task.Delay(lifeBuffer + 1000);
+        await timer.DisposeAsync();
     }
 
     private void NavigateToComponent(Blogger p) {

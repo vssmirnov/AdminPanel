@@ -4,6 +4,8 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components
 @using System.Web
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedLocalStorage ProtectedLocalStore
 @inject Services.PostService PostService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
@@ -49,14 +51,40 @@ else
 
 
 @code {
-    public IList<Post> PostsToShow;        
+    public IList<Post> PostsToShow;
+    private const int lifeBuffer = 300000;
 
     protected override async Task OnInitializedAsync()
     {
         string uri = NavigationManager.Uri;
         string id = uri.Substring(uri.IndexOf("?Id=")+4);
 
-        PostsToShow = await PostService.GetPostsAsync(id);
+        var result = await ProtectedLocalStore.GetAsync<IList<Post>>("Post"+id);
+
+        if (result.Success)
+        {
+            PostsToShow = result.Value;
+        }
+        else
+        {
+            PostsToShow = await PostService.GetPostsAsync(id);
+            await ProtectedLocalStore.SetAsync("Post"+id, PostsToShow);
+
+            System.Threading.Timer timer;
+            timer = new System.Threading.Timer(async _ => 
+            {
+                await ProtectedLocalStore.DeleteAsync("Post"+id);
+            }, null, lifeBuffer, lifeBuffer);
+
+            CloseTimer(timer);
+        }
+
         base.OnInitialized();
+    }
+    
+    private async Task CloseTimer(System.Threading.Timer timer)
+    {
+        await Task.Delay(lifeBuffer + 1000);
+        await timer.DisposeAsync();
     }
 }

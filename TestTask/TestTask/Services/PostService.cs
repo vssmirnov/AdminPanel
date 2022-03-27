@@ -4,7 +4,7 @@ namespace TestTask.Services
 {
     public class PostService
     {
-        public async Task<IList<Post>> GetPostsAsync()
+        public async Task<IList<Post>> GetPostsAsync(string Id)
         {
             return await Task.Run(() => new List<Post>() { new Post {
                 id = "60d21b4667d0d8992e610c85",

@@ -1,6 +1,9 @@
 ﻿@page "/Posts"
 @using Models
 @using Data
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components
+@using System.Web
 @inject Services.PostService PostService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
@@ -47,10 +50,13 @@ else
 
 @code {
     public IList<Post> PostsToShow;        
-    
+
     protected override async Task OnInitializedAsync()
     {
-        PostsToShow = await PostService.GetPostsAsync();
+        string uri = NavigationManager.Uri;
+        string id = uri.Substring(uri.IndexOf("?Id=")+4);
+
+        PostsToShow = await PostService.GetPostsAsync(id);
         base.OnInitialized();
     }
 }

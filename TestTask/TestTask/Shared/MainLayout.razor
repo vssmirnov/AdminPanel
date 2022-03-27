@@ -2,6 +2,7 @@
 @using TestTask.Pages
 @inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 <PageTitle>TestTask</PageTitle>
 
@@ -33,6 +34,6 @@
     public void Logout()
     {
         ((CustomAuthenticationStateProvider)AuthenticationStateProvider).Logout();
-        //NavigationManager.NavigateTo("/login");
+        NavigationManager.NavigateTo("/login");
     }
 }

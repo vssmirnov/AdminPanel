@@ -1,0 +1,85 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using Data
+@using System.Security.Claims
+@inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<div class="main-login-page">
+    <div class="container py-5 py-sm-7">
+        <div class="row justify-content-center mb-5">
+            <img src="user-avatar-with-check-mark.svg" alt="" class="login-page-logo">
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5">
+                <div class="card card-lg mb-5">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <h1>Sign In</h1>
+                            <p>Enter your username and password</p>
+                        </div>
+                        <EditForm Model="myModel" OnValidSubmit="Success">
+                            <DataAnnotationsValidator />
+                            <div class="form-group">
+                                <label for="loginUsername" class="input-label text-capitalize">Username</label>
+                                <InputText class="form-control form-control-lg" autocomplete="off" tabindex="1" Placeholder="Username"
+                                    id="loginUsername" @bind-Value="@myModel.Username" />
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword" class="input-label text-capitalize">Password</label>
+                                <InputText  type="password" tabindex="2" class="form-control form-control-lg"
+                                    Placeholder="Password" id="loginPassword" @bind-Value="@myModel.Password" />
+                            </div>
+                            <button type="submit" class="btn btn-lg btn-block btn-primary">Sign In</button>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    ClaimsPrincipal claimsPrincipal;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        claimsPrincipal = (await authenticationStateTask).User;
+
+        if (claimsPrincipal.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+
+    }
+    async Task Success()
+    {
+        var userFromService = await
+        ((CustomAuthenticationStateProvider)AuthenticationStateProvider).AuthenticateUser(myModel.Username, myModel.Password);
+        if (userFromService == false)
+        {
+            await JS.InvokeAsync<object>("alert", "Unsuccessful login!");
+        }
+        else
+        {
+            await JS.InvokeAsync<object>("alert", "Successful login!");
+            NavigationManager.NavigateTo("/");
+        }
+    }
+    LoginModel myModel = new LoginModel();
+
+    public class LoginModel
+    {
+        [Required]
+        public string Username { get; set; }
+
+        [Required]
+        //[MinLength(8)]
+        public string Password { get; set; }
+    }
+}

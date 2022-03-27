@@ -1,0 +1,38 @@
+﻿@using Data
+@using TestTask.Pages
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>TestTask</PageTitle>
+
+<div class="page">
+    <AuthorizeView>
+    <Authorized>
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+
+        <div class="main">
+            <div class="top-row px-4">
+                <a href="login" @onclick="Logout">Logout</a>
+            </div>
+            <div class="content px-4">
+                @Body
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="px-0">
+            <Login />
+        </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+@code {
+    public void Logout()
+    {
+        ((CustomAuthenticationStateProvider)AuthenticationStateProvider).Logout();
+        //NavigationManager.NavigateTo("/login");
+    }
+}

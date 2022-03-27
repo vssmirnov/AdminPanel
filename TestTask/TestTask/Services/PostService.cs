@@ -1,18 +1,47 @@
-﻿using TestTask.Models;
+﻿using System.Text.Json;
+using TestTask.Models;
 
 namespace TestTask.Services
 {
     public class PostService
     {
+        private string apiKey;
+        private string baseUrl;
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public PostService(string apiKey, string baseUrl, IHttpClientFactory httpClientFactory)
+        {
+            this.apiKey = apiKey;
+            this.baseUrl = baseUrl;
+            _httpClientFactory = httpClientFactory;
+        }
+
         public async Task<IList<Post>> GetPostsAsync(string Id)
         {
-            return await Task.Run(() => new List<Post>() { new Post {
-                id = "60d21b4667d0d8992e610c85",
-                image = "https://img.dummyapi.io/photo-1564694202779-bc908c327862.jpg",
-                likes = 43,                
-                text = "adult Labrador retriever",
-                publishDate = "2020-05-24T14:53:17.598Z",
-            }});
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, baseUrl + $"/user/{Id}/post?limit=10")
+            {
+                Headers = { { "app-id", apiKey }
+            }
+            };
+
+            var httpClient = _httpClientFactory.CreateClient();
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                using var contentStream =
+                    await httpResponseMessage.Content.ReadAsStreamAsync();
+
+                var posts = await JsonSerializer.DeserializeAsync<PostHttpModel>(contentStream);
+
+                return posts.data.ToList();
+            }
+
+            return new List<Post>();
         }
+    }
+    class PostHttpModel
+    {
+        public IEnumerable<Post> data { get; set; }
     }
 }

@@ -6,13 +6,20 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// dotnet user-secret set "ApiKey" ""
+var apiKey = builder.Configuration["ApiKey"];
+var baseUrl = builder.Configuration["Baseurl"];
+
 // Add services to the container.
+builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddOptions();
 builder.Services.AddTransient<AuthService>();
-builder.Services.AddTransient<BloggerService>();
-builder.Services.AddTransient<PostService>();
+builder.Services.AddTransient<BloggerService>(x => new BloggerService(apiKey, baseUrl, 
+        builder.Services.BuildServiceProvider().GetService<IHttpClientFactory>()));
+builder.Services.AddTransient<PostService>(x => new PostService(apiKey, baseUrl,
+        builder.Services.BuildServiceProvider().GetService<IHttpClientFactory>()));
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 

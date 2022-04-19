@@ -1,6 +1,5 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using TestTask.Data;
+using TestTask.Interfaces;
+using TestTask.Providers;
 using TestTask.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 
@@ -20,16 +19,16 @@ builder.Services.AddHttpClient("ignoreSSL", c => {}).ConfigurePrimaryHttpMessage
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddOptions();
-builder.Services.AddTransient<AuthService>();
-builder.Services.AddTransient<BloggerWebCacheService>();
-builder.Services.AddTransient<PostWebCacheService>();
+builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<IBloggerWebCacheService, BloggerWebCacheService>();
+builder.Services.AddTransient<IPostWebCacheService, PostWebCacheService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
 var httpClientFactory = builder.Services.BuildServiceProvider().GetService<IHttpClientFactory>();
 
-builder.Services.AddTransient<BloggerService>(x => new BloggerService(apiKey, baseUrl, httpClientFactory));
-builder.Services.AddTransient<PostService>(x => new PostService(apiKey, baseUrl, httpClientFactory));
+builder.Services.AddTransient<IBloggerService>(x => new BloggerService(apiKey, baseUrl, httpClientFactory));
+builder.Services.AddTransient<IPostService>(x => new PostService(apiKey, baseUrl, httpClientFactory));
 
 var app = builder.Build();
 

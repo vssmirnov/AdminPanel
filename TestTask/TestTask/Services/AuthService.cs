@@ -1,8 +1,9 @@
 ﻿using TestTask.Models;
+using TestTask.Interfaces;
 
 namespace TestTask.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         public async Task<User> LoginAsync(string username, string password)
         {

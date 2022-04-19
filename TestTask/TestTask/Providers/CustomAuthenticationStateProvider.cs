@@ -1,14 +1,14 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
-using TestTask.Services;
+using TestTask.Interfaces;
 
-namespace TestTask.Data
+namespace TestTask.Providers
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
 
-        public CustomAuthenticationStateProvider(AuthService authService)
+        public CustomAuthenticationStateProvider(IAuthService authService)
         {
             _authService = authService;
         }

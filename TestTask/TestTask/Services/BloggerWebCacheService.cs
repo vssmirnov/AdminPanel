@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using TestTask.Interfaces;
 
 namespace TestTask.Services
 {
-    public class BloggerWebCacheService : WebCacheService
+    public class BloggerWebCacheService : WebCacheService, IBloggerWebCacheService
     {
-        private readonly BloggerService postService;
+        private readonly IBloggerService postService;
         private readonly ProtectedLocalStorage protectedLocalStorage;
 
-        public BloggerWebCacheService(BloggerService postService, ProtectedLocalStorage protectedLocalStorage)
+        public BloggerWebCacheService(IBloggerService postService, ProtectedLocalStorage protectedLocalStorage)
         {
             this.postService = postService;
             this.protectedLocalStorage = protectedLocalStorage;

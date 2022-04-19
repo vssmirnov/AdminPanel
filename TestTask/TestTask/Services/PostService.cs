@@ -1,13 +1,13 @@
-﻿using System.Text.Json;
-using TestTask.Models;
+﻿using TestTask.Models;
+using TestTask.Interfaces;
 
 namespace TestTask.Services
 {
-    public class PostService : BaseRestService<Post>
+    public class PostService : BaseRestService<Post>, IPostService
     {
         private string baseUrl;
 
-        public PostService(string apiKey, string baseUrl, IHttpClientFactory httpClientFactory): base(apiKey, httpClientFactory)
+        public PostService(string apiKey, string baseUrl, IHttpClientFactory httpClientFactory) : base(apiKey, httpClientFactory)
         {
             this.baseUrl = baseUrl;
         }
@@ -17,6 +17,6 @@ namespace TestTask.Services
             string requestUri = baseUrl + $"/user/{Id}/post?limit=10";
 
             return await GetRequest(requestUri);
-        }        
+        }
     }
 }

@@ -1,13 +1,13 @@
-﻿using System.Text.Json;
-using TestTask.Models;
+﻿using TestTask.Models;
+using TestTask.Interfaces;
 
 namespace TestTask.Services
 {
-    public class BloggerService: BaseRestService<Blogger>
+    public class BloggerService : BaseRestService<Blogger>, IBloggerService
     {
         private string baseUrl;
 
-        public BloggerService(string apiKey, string baseUrl, IHttpClientFactory httpClientFactory): base(apiKey, httpClientFactory)
+        public BloggerService(string apiKey, string baseUrl, IHttpClientFactory httpClientFactory) : base(apiKey, httpClientFactory)
         {
             this.baseUrl = baseUrl;
         }

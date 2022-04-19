@@ -1,9 +1,8 @@
 ﻿@page "/Bloggers"
 @using Models
-@using Data
+@using Providers
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
-@using TestTask.Services
-@inject Services.BloggerWebCacheService BloggerWebCacheService
+@inject Interfaces.IBloggerWebCacheService BloggerWebCacheService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
 

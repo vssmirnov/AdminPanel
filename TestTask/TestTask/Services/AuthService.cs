@@ -1,15 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using TestTask.Models;
+﻿using TestTask.Models;
 
 namespace TestTask.Services
 {
     public class AuthService
     {
-        public AuthService()
-        {
-        }
-
         public async Task<User> LoginAsync(string username, string password)
         {
             var admin = new User

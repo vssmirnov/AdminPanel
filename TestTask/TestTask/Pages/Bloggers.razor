@@ -30,12 +30,12 @@ else
                     <div class="card" style="width: 100%;">
                         <div class="row">
                             <div class="col-3">
-                                <img src="@blogger.picture" class="card-img-top" alt="@blogger.title">
+                                <img src="@blogger.Picture" class="card-img-top" alt="@blogger.Title">
                             </div>
                             <div class="col-9">
                                 <div class="card-body">
-                                    <h5 class="card-title">@blogger.id</h5>
-                                    <h5 class="card-title" style="text-decoration: underline">@blogger.title @blogger.firstName @blogger.lastName</h5>
+                                    <h5 class="card-title">@blogger.Id</h5>
+                                    <h5 class="card-title" style="text-decoration: underline">@blogger.Title @blogger.FirstName @blogger.LastName</h5>
                                 </div>
                             </div>
                         </div>
@@ -56,6 +56,6 @@ else
     }
 
     private void NavigateToComponent(Blogger p) {
-        NavigationManager.NavigateTo("Posts?Id=" + p.id);
+        NavigationManager.NavigateTo("Posts?Id=" + p.Id);
     }
 }

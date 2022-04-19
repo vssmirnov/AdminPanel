@@ -27,31 +27,29 @@ else
 {
     <div class="row">
         @foreach (var post in posts)
-                {
-                    <div class="col-12">
-                        <div class="card" style="width: 100%;">
-                            <div class="row">
-                                <div class="col-3">
-                                    <img src="@post.image" class="card-img-top" alt="@post.text">
-                                </div>
-                                <div class="col-9">
-                                    <div class="card-body">
-                                        <small class="mb-4">@ConvertToDateFormat(@post.publishDate)</small>
-                                        <div class="mb-4">@post.text</div>
-                                        <div class="card-text">
-                                            <img width="25" class="w-5 mr-2 float-left" alt="like" src="https://dummyapi.io/img/like.svg">
-                                            @post.likes
-                                        </div>
+            {
+                <div class="col-12">
+                    <div class="card" style="width: 100%;">
+                        <div class="row">
+                            <div class="col-3">
+                                <img src="@post.Image" class="card-img-top" alt="@post.Text">
+                            </div>
+                            <div class="col-9">
+                                <div class="card-body">
+                                    <small class="mb-4">@ConvertToDateFormat(@post.PublishDate)</small>
+                                    <div class="mb-4">@post.Text</div>
+                                    <div class="card-text">
+                                        <img width="25" class="w-5 mr-2 float-left" alt="like" src="https://dummyapi.io/img/like.svg">
+                                        @post.Likes
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                }
+                </div>
+            }
     </div>
 }
-
-
 
 @code {
     public IList<Post> posts;

@@ -7,6 +7,7 @@ namespace TestTask.Data
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         private readonly AuthService _authService;
+
         public CustomAuthenticationStateProvider(AuthService authService)
         {
             _authService = authService;

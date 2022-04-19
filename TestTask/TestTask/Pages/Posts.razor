@@ -7,18 +7,19 @@
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject ProtectedLocalStorage ProtectedLocalStore
 @inject Services.PostService PostService
+@inject Services.WebCacheService WebCacheService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
 
 <h2 class="title">Posts</h2>
 
-@if (PostsToShow == null)
+@if (posts == null)
 {
     <p>
         <em>Loading...</em>
     </p>
 }
-else if (!PostsToShow.Any())
+else if (!posts.Any())
 {
     <p>
         <em>No recipes exist. Please add some.</em>
@@ -27,7 +28,7 @@ else if (!PostsToShow.Any())
 else
 {
     <div class="row">
-        @foreach (var post in PostsToShow)
+        @foreach (var post in posts)
                 {
                     <div class="col-12">
                         <div class="card" style="width: 100%;">
@@ -55,8 +56,8 @@ else
 
 
 @code {
-    public IList<Post> PostsToShow;
-    private const int lifeBuffer = 300000;
+    public IList<Post> posts;
+    private const int lifeBuffer = 1;
 
     private string ConvertToDateFormat(string date)
     {
@@ -67,33 +68,15 @@ else
     {
         string uri = NavigationManager.Uri;
         string id = uri.Substring(uri.IndexOf("?Id=")+4);
-
-        var result = await ProtectedLocalStore.GetAsync<IList<Post>>("Post"+id);
-
-        if (result.Success)
-        {
-            PostsToShow = result.Value;
-        }
-        else
-        {
-            PostsToShow = await PostService.GetPostsAsync(id);
-            await ProtectedLocalStore.SetAsync("Post"+id, PostsToShow);
-
-            System.Threading.Timer timer;
-            timer = new System.Threading.Timer(async _ => 
-            {
-                await ProtectedLocalStore.DeleteAsync("Post"+id);
-            }, null, lifeBuffer, lifeBuffer);
-
-            CloseTimer(timer);
-        }
+        
+        posts = await WebCacheService.GetData<Post>(ProtectedLocalStore, "Post"+id, PostService.GetPostsAsync, id);
 
         base.OnInitialized();
     }
-    
-    private async Task CloseTimer(System.Threading.Timer timer)
+
+    private class PostCacheData
     {
-        await Task.Delay(lifeBuffer + 1000);
-        await timer.DisposeAsync();
+        public IList<Post> Data { get; set; }
+        public DateTime GetDateTime { get; set; }
     }
 }

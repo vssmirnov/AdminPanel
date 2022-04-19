@@ -2,20 +2,22 @@
 @using Models
 @using Data
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using TestTask.Services
 @inject ProtectedLocalStorage ProtectedLocalStore
 @inject Services.BloggerService BloggerService
+@inject Services.WebCacheService WebCacheService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
 
 <h2 class="title">Bloggers</h2>
 
-@if (BloggersToShow == null)
+@if (bloggers == null)
 {
     <p>
         <em>Loading...</em>
     </p>
 }
-else if (!BloggersToShow.Any())
+else if (!bloggers.Any())
 {
     <p>
         <em>No recipes exist. Please add some.</em>
@@ -24,7 +26,7 @@ else if (!BloggersToShow.Any())
 else
 {
     <div class="row">
-        @foreach (var blogger in BloggersToShow)
+        @foreach (var blogger in bloggers)
                 {
                     <div class="col-12" @onclick="@(() => NavigateToComponent(blogger))">
                         <div class="card" style="width: 100%;">
@@ -45,44 +47,17 @@ else
     </div>
 }
 
-
-
 @code {
-    public IList<Blogger> BloggersToShow;  
-    private const int lifeBuffer = 300000;
+    public IList<Blogger> bloggers;  
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await ProtectedLocalStore.GetAsync<IList<Blogger>>("Blogger");
-
-        if (result.Success)
-        {
-            BloggersToShow = result.Value;
-        }
-        else
-        {
-            BloggersToShow = await BloggerService.GetBloggersAsync();
-            await ProtectedLocalStore.SetAsync("Blogger", BloggersToShow);
-
-            System.Threading.Timer timer;
-            timer = new System.Threading.Timer(async _ => 
-            {
-               await ProtectedLocalStore.DeleteAsync("Blogger");
-            }, null, lifeBuffer, lifeBuffer);
-
-            CloseTimer(timer);
-        }
+        bloggers = await WebCacheService.GetData<Blogger>(ProtectedLocalStore, "Blogger", BloggerService.GetBloggersAsync);
 
         base.OnInitialized();
     }
 
-    private async Task CloseTimer(System.Threading.Timer timer)
-    {
-        await Task.Delay(lifeBuffer + 1000);
-        await timer.DisposeAsync();
-    }
-
     private void NavigateToComponent(Blogger p) {
-      NavigationManager.NavigateTo("Posts?Id=" + p.id);
+        NavigationManager.NavigateTo("Posts?Id=" + p.id);
     }
 }

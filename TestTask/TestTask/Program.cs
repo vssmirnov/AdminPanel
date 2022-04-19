@@ -21,7 +21,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddOptions();
 builder.Services.AddTransient<AuthService>();
-builder.Services.AddTransient<WebCacheService>();
+builder.Services.AddTransient<BloggerWebCacheService>();
+builder.Services.AddTransient<PostWebCacheService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 

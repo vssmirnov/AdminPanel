@@ -5,9 +5,7 @@
 @using Microsoft.AspNetCore.Components
 @using System.Web
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
-@inject ProtectedLocalStorage ProtectedLocalStore
-@inject Services.PostService PostService
-@inject Services.WebCacheService WebCacheService
+@inject Services.PostWebCacheService PostWebCacheService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
 
@@ -57,7 +55,6 @@ else
 
 @code {
     public IList<Post> posts;
-    private const int lifeBuffer = 1;
 
     private string ConvertToDateFormat(string date)
     {
@@ -69,14 +66,8 @@ else
         string uri = NavigationManager.Uri;
         string id = uri.Substring(uri.IndexOf("?Id=")+4);
         
-        posts = await WebCacheService.GetData<Post>(ProtectedLocalStore, "Post"+id, PostService.GetPostsAsync, id);
+        posts = await PostWebCacheService.GetListData("Post"+id, id);
 
         base.OnInitialized();
-    }
-
-    private class PostCacheData
-    {
-        public IList<Post> Data { get; set; }
-        public DateTime GetDateTime { get; set; }
     }
 }

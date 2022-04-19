@@ -3,9 +3,7 @@
 @using Data
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using TestTask.Services
-@inject ProtectedLocalStorage ProtectedLocalStore
-@inject Services.BloggerService BloggerService
-@inject Services.WebCacheService WebCacheService
+@inject Services.BloggerWebCacheService BloggerWebCacheService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
 
@@ -27,23 +25,23 @@ else
 {
     <div class="row">
         @foreach (var blogger in bloggers)
-                {
-                    <div class="col-12" @onclick="@(() => NavigateToComponent(blogger))">
-                        <div class="card" style="width: 100%;">
-                            <div class="row">
-                                <div class="col-3">
-                                    <img src="@blogger.picture" class="card-img-top" alt="@blogger.title">
-                                </div>
-                                <div class="col-9">
-                                    <div class="card-body">
-                                        <h5 class="card-title">@blogger.id</h5>
-                                        <h5 class="card-title" style="text-decoration: underline">@blogger.title @blogger.firstName @blogger.lastName</h5>
-                                    </div>
+            {
+                <div class="col-12" @onclick="@(() => NavigateToComponent(blogger))">
+                    <div class="card" style="width: 100%;">
+                        <div class="row">
+                            <div class="col-3">
+                                <img src="@blogger.picture" class="card-img-top" alt="@blogger.title">
+                            </div>
+                            <div class="col-9">
+                                <div class="card-body">
+                                    <h5 class="card-title">@blogger.id</h5>
+                                    <h5 class="card-title" style="text-decoration: underline">@blogger.title @blogger.firstName @blogger.lastName</h5>
                                 </div>
                             </div>
                         </div>
                     </div>
-                }
+                </div>
+            }
     </div>
 }
 
@@ -52,7 +50,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        bloggers = await WebCacheService.GetData<Blogger>(ProtectedLocalStore, "Blogger", BloggerService.GetBloggersAsync);
+        bloggers = await BloggerWebCacheService.GetListData("Blogger");
 
         base.OnInitialized();
     }

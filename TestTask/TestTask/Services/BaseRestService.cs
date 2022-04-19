@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TestTask.Services
 {
@@ -25,16 +26,21 @@ namespace TestTask.Services
                 };
 
                 var httpClient = httpClientFactory.CreateClient("ignoreSSL");
-                using var result = await httpClient.SendAsync(httpRequestMessage);
-
-                if (result.IsSuccessStatusCode)
+                try
                 {
-                    using var contentStream = await result.Content.ReadAsStreamAsync();
+                    using var result = await httpClient.SendAsync(httpRequestMessage);
 
-                    var resultRequest = await JsonSerializer.DeserializeAsync<HttpModel<T>>(contentStream);
+                    if (result.IsSuccessStatusCode)
+                    {
+                        using var contentStream = await result.Content.ReadAsStreamAsync();
 
-                    return resultRequest != null ? resultRequest.data : new List<T>();
-                }
+                        var resultRequest = await JsonSerializer.DeserializeAsync<HttpModel<T>>(contentStream);
+
+                        return resultRequest != null ? resultRequest.Data : new List<T>();
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine(ex);
+                }                                
             }
 
             return new List<T>();
@@ -42,7 +48,8 @@ namespace TestTask.Services
 
         class HttpModel<T>
         {
-            public List<T> data { get; set; }
+            [JsonPropertyName("data")]
+            public List<T> Data { get; set; }
         }
 
     }

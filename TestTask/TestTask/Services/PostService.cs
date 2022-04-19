@@ -3,7 +3,7 @@ using TestTask.Models;
 
 namespace TestTask.Services
 {
-    public class PostService: BaseRestService<Post>
+    public class PostService : BaseRestService<Post>
     {
         private string baseUrl;
 

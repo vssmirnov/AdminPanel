@@ -2,12 +2,12 @@
 
 namespace TestTask.Services
 {
-    public class WebCacheService
+    public abstract class WebCacheService
     {
-        private const int lifeBuffer = 1;
+        protected virtual int lifeBuffer { get; set; } = 1;        
 
-        public async Task<IList<T>> GetData<T>(ProtectedLocalStorage store, string cacheName, Func<Task<IList<T>>> getData){
-            
+        public async Task<IList<T>> GetListData<T>(ProtectedLocalStorage store, string cacheName, Func<Task<IList<T>>> getData)
+        {
             var cacheValues = await GetValueFromCache<T>(store, cacheName);
 
             if (cacheValues != null)
@@ -22,36 +22,32 @@ namespace TestTask.Services
             }
         }
 
-        public async Task<IList<T>> GetData<T>(ProtectedLocalStorage store, string cacheName, Func<string, Task<IList<T>>> getData, string param)
+        protected async Task SetCache<T>(ProtectedLocalStorage store, string cacheName, IList<T> resultRequest)
         {
-            
-            var cacheValues = await GetValueFromCache<T>(store, cacheName);
-
-            if (cacheValues != null)
+            try
             {
-                return cacheValues;
-            }
-            else
+                await store.DeleteAsync(cacheName);
+                var cacheData = new CachedData<T>() { Data = resultRequest, GetDateTime = DateTime.Now.AddMinutes(lifeBuffer) };
+                await store.SetAsync(cacheName, cacheData);
+            }            
+            catch (Exception ex)
             {
-                IList<T> resultRequest = await getData(param);
-                await SetCache(store, cacheName, resultRequest);
-                return resultRequest;
+                Console.WriteLine(ex);                
             }
         }
 
-        private static async Task SetCache<T>(ProtectedLocalStorage store, string cacheName, IList<T> resultRequest)
+        protected async Task<IList<T>?> GetValueFromCache<T>(ProtectedLocalStorage store, string cacheName)
         {
-            await store.DeleteAsync(cacheName);
-            var cacheData = new CachedData<T>() { Data = resultRequest, GetDateTime = DateTime.Now.AddMinutes(lifeBuffer) };
-            await store.SetAsync(cacheName, cacheData);
-        }
-
-        private async Task<IList<T>?> GetValueFromCache<T>(ProtectedLocalStorage store, string cacheName)
-        {
-            var result = await store.GetAsync<CachedData<T>>(cacheName);
-
-            bool isValidCache = result.Success && result.Value != null && result.Value.GetDateTime > DateTime.Now;
-            return isValidCache ? result.Value.Data : null;
+            try
+            {
+                var result = await store.GetAsync<CachedData<T>>(cacheName);
+                bool isValidCache = result.Success && result.Value != null && result.Value.GetDateTime > DateTime.Now;
+                return isValidCache ? result.Value.Data : null;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return new List<T>();
+            }
         }
 
         private class CachedData<T>
